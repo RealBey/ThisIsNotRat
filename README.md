@@ -57,6 +57,8 @@ python tinar.py
 
 /shutdown  🙅
 
+/location to get device location 🗺️
+
 
 DEMO:
 
